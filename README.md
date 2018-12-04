@@ -2,6 +2,7 @@
 Keyboard controlled YM2612
 
 File: main.c
+
 	Initialize peripherals, launch child progress and get commands via a pipe to
 	control the sound chip(s) through an I/O expander.
 	Build the frequency table at runtime based on the defined clock.
@@ -10,16 +11,19 @@ File: main.c
 	the CHIP_COUNT constant. 
 
 File: chanqueue.c
+
 	Circular queue implementation for channel pointers.
 	This way, by re-using the "oldest" available channel first, keys are more likely
 	to go through their whole note-release phase.
 
 File: instruments.c
+
 	Count the number of .dmp (Deflemask patches) file in the patches folder, allocate
 	memory for them then parses them in structures. Using this file format
 	allows to design instruments easily using Deflemask tracker.
 
 File: midiin.c 
+
 	Child process program, read from MIDI, filter off the Alive signal
 	and send a 3 bytes command to the main program on events. Now keeps track
 	of the number of channels used and send an "all off" command when all channels
