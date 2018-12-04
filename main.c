@@ -52,7 +52,6 @@ int main(void) {
 		channels[i].instrument = current_instrument;
 		write_instrument(&channels[i]);
 		release_chan(chanqueue, &channels[i]); // Store channels pointer in the queue
-
 	}
 
 	pipe_fd = launch_midi();
