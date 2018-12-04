@@ -61,45 +61,48 @@ int main(void) {
 		while(read(pipe_fd, input_buffer, 3) < 3);
 		printf("command:0x%02x, arg1:0x%02x, arg2:0x%02x\n", input_buffer[0], input_buffer[1], input_buffer[2]);
 		switch(input_buffer[0]) {
-			case NOTE_ON: 
-				if (queue_not_empty(chanqueue)) {
-					current_chan = get_chan(chanqueue);
-					
-					if (current_chan->instrument != current_instrument) {
-						current_chan->instrument = current_instrument;
-						write_instrument(current_chan);
-					}
-					current_chan->key = input_buffer[1];
-					key_on(current_chan, freq_table[input_buffer[1]], input_buffer[2]);
+		case NOTE_ON: 
+			if (queue_not_empty(chanqueue)) {
+				current_chan = get_chan(chanqueue);
+
+				if (current_chan->instrument != current_instrument) {
+					current_chan->instrument = current_instrument;
+					write_instrument(current_chan);
 				}
-				break;
-			
-			case NOTE_OFF:
-				for (int i = 0; i <	CHIP_COUNT*6; i++) {
-					if (channels[i].key == input_buffer[1]) {
-						key_off(&channels[i]);
-						channels[i].key = 0xFF;
-						release_chan(chanqueue, &channels[i]);
-						break;
-					} 
-				}
+				current_chan->key = input_buffer[1];
+				key_on(current_chan, freq_table[input_buffer[1]], input_buffer[2]);
+			}
+			break;
+
+		case NOTE_OFF:
+			for (int i = 0; i <	CHIP_COUNT*6; i++) {
+				if (channels[i].key == input_buffer[1]) {
+					key_off(&channels[i]);
+					channels[i].key = 0xFF;
+					release_chan(chanqueue, &channels[i]);
 					break;
-			case SWITCH_INST:
-				if (input_buffer[1] < patch_list->count) {
-					current_instrument = &patch_list->instrument[input_buffer[1]];
-				}
-					break;
-			case ALL_OFF:
-				for (int i = 0; i < CHIP_COUNT*6; i++) {
-					if (channels[i].key != 0xFF) {
-						channels[i].key = 0xFF;
-						release_chan(chanqueue, &channels[i]);
-					}
-				}
+				} 
+			}
 				break;
-			default: 
-				printf("Unexpected command: 0x%02x, Exiting.\n", input_buffer[0]);
-				exit(1);
+				
+		case SWITCH_INST:
+			if (input_buffer[1] < patch_list->count) {
+				current_instrument = &patch_list->instrument[input_buffer[1]];
+			}
+				break;
+				
+		case ALL_OFF:
+			for (int i = 0; i < CHIP_COUNT*6; i++) {
+				if (channels[i].key != 0xFF) {
+					channels[i].key = 0xFF;
+					release_chan(chanqueue, &channels[i]);
+				}
+			}
+			break;
+				
+		default: 
+			printf("Unexpected command: 0x%02x, Exiting.\n", input_buffer[0]);
+			exit(1);
 		}
 	}
 
