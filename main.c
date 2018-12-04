@@ -46,8 +46,8 @@ int main(void) {
 	for (int i = 0; i < CHIP_COUNT; i++) {
 		write_to_reg(LFO_REG, 0, CS << i, PART_1);
 		write_to_reg(CH3_MODE, 0, CS << i, PART_1);
-		
 	}
+	
 	for (int i = 0; i < CHIP_COUNT*6; i++) {
 		channels[i].instrument = current_instrument;
 		write_instrument(&channels[i]);
@@ -122,14 +122,14 @@ int launch_midi() {
 	pid = fork();
 
 	switch(pid) {
-		case -1:
-			perror("Process creation failure\n");
-			exit(1);
-		case 0: // Child process
-			close(pipe_fd[0]);
-			execl("midiin", "midiin", fd_str, NULL);
-		default: // Parent process
-			close(pipe_fd[1]);
+	case -1:
+		perror("Process creation failure\n");
+		exit(1);
+	case 0: // Child process
+		close(pipe_fd[0]);
+		execl("midiin", "midiin", fd_str, NULL);
+	default: // Parent process
+		close(pipe_fd[1]);
 	}
 
 	return pipe_fd[0];
@@ -189,29 +189,29 @@ void key_on(CHANNEL * chan, uint16_t frequency, uint8_t volume) {
 	uint8_t msb = (uint8_t)(frequency >> 8);
 	uint8_t lsb = (uint8_t)(frequency & 0xff);
 	switch(chan->instrument->algo) {
-		case 0:
-		case 1:
-		case 2:
+	case 0:
+	case 1:
+	case 2:
     		write_to_reg(TL_REG | chan->op4_addr, volume, chan->chip_cs, chan->part);
-		break;
-		case 4:
+	break;
+	case 4:
     		write_to_reg(TL_REG | chan->op2_addr, volume, chan->chip_cs, chan->part);
     		write_to_reg(TL_REG | chan->op4_addr, volume, chan->chip_cs, chan->part);
-		break;
-		case 5:
-		case 6:	
+	break;
+	case 5:
+	case 6:	
     		write_to_reg(TL_REG | chan->op2_addr, volume, chan->chip_cs, chan->part);
     		write_to_reg(TL_REG | chan->op3_addr, volume, chan->chip_cs, chan->part);
     		write_to_reg(TL_REG | chan->op4_addr, volume, chan->chip_cs, chan->part);
-		break;
-		case 7:
+	break;
+	case 7:
     		write_to_reg(TL_REG | chan->op1_addr, volume, chan->chip_cs, chan->part);
     		write_to_reg(TL_REG | chan->op2_addr, volume, chan->chip_cs, chan->part);
     		write_to_reg(TL_REG | chan->op3_addr, volume, chan->chip_cs, chan->part);
     		write_to_reg(TL_REG | chan->op4_addr, volume, chan->chip_cs, chan->part);
-		break;
-		default:
-			printf("algo out of bound\n");
+	break;
+	default:
+		printf("algo out of bound\n");
 	}
 	
 	write_to_reg(FREQ_MSB | chan->op1_addr, msb, chan->chip_cs, chan->part);
